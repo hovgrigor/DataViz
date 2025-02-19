@@ -1,0 +1,146 @@
+---
+title: "HM2"
+output: pdf_document
+date: "2025-02-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Homework N2
+
+## Part 3: Use the datasets provided to create graphs
+
+```{r}
+library(dplyr)
+
+
+df_lung <- read.csv("C:\\Users\\Hovgr\\OneDrive\\Desktop\\DataViz\\HM2\\lung_cancer_prediction_dataset.csv")
+head(df_lung, 5)
+
+```
+
+```{r}
+df_air <- read.csv("C:\\Users\\Hovgr\\OneDrive\\Desktop\\DataViz\\HM2\\global_air_pollution_dataset.csv")
+head(df_air, 5)
+```
+
+### 1. Create a Boxplot of Lung Cancer Deaths Distribution.
+
+```{r}
+library(ggplot2)
+library(ggthemes)
+
+ggplot(df_lung, aes(x = Annual_Lung_Cancer_Deaths)) + geom_boxplot() + ylim(-1,1)
+```
+
+### 2. Create a Histogram of PM2.5 AQI Values.
+
+```{r}
+ggplot(df_air, aes(x = PM2.5_AQI_Value)) + geom_histogram(bins=50)
+```
+
+### 3. Create a Density Plot of the Lung Cancer Mortality Rate.
+
+```{r}
+ggplot(df_lung, aes(x = Mortality_Rate)) + geom_density()
+```
+
+### 4. Create a Scatter Plot by generating 100 random values from both the normal and logistic distributions. The points should be brown and use theme_solarized with argument light set to false.
+
+```{r}
+x = rnorm(100)
+y = rlogis(100)
+
+ggplot() + geom_point(aes(x,y), color="brown") + labs(x = "Normal", y = "Logistic") + theme_solarized(light=FALSE)
+```
+
+## Part 4: Recreate the following graphs
+
+### 2. Use the gpplot2 package for this graph. (Hint: Aggregate the data then merge the two datasets. Use only the necessary columns.)
+
+```{r}
+df1 <- group_by(df_air, Country) %>% summarise(PM2.5_AQI_Value = mean(PM2.5_AQI_Value))
+df2 <- group_by(df_lung, Country) %>% summarise(Annual_Lung_Cancer_Deaths = sum(Annual_Lung_Cancer_Deaths))
+
+joined_df <- inner_join(df1, df2, by="Country")
+
+ggplot(joined_df, aes(x = PM2.5_AQI_Value, y = Annual_Lung_Cancer_Deaths, color = Country)) +
+  geom_point(aes(size=Annual_Lung_Cancer_Deaths)) + 
+  labs(title = "PM2.5 AQI vs. Annual Lung Cancer Deaths", x = "PM2.5 AQI Value", y = "Annual Lung Cancer Deaths") +
+  geom_text(
+    aes(label = ifelse(Annual_Lung_Cancer_Deaths > 500000000, Country, ''), 
+    size=Annual_Lung_Cancer_Deaths), color="black", 
+    fontface = "bold") +
+  theme(
+    plot.title = element_text(color = "darkred", face="bold", size=15),
+    plot.background = element_rect(fill = "#f7f7f7"),
+    panel.border = element_rect(color = "black", fill=NA),
+    panel.background = element_rect(fill = "#f7f7f7",
+                                size = 0.5, linetype = "solid"),
+    panel.grid.major = element_line(size = 0.6, linetype = 'dashed',
+                                color = "gray"),
+    panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                color = "#ebebeb"),
+    legend.background = element_rect(fill = "#f7f7f7"),
+    axis.text.x = element_text(angle = 45, vjust = 0.5, color="blue")
+    )
+```
+
+### 3. Use the ggplot2 package for this graph. (Hint: use geom_jitter since y axis contains categorical data, also use the following colors: #5469f1 , #d554f1)
+
+```{r}
+filtered_df_lung <-  df_lung %>% filter(Cancer_Stage != "None", Years_of_Smoking > 0)
+ggplot(filtered_df_lung, 
+       aes(x = Years_of_Smoking, y=Cancer_Stage, color = Gender, shape=Gender)
+  ) + 
+  geom_jitter(alpha=0.7) + 
+  facet_grid(~Gender) + 
+  scale_color_manual(values = c("#d554f1","#5469f1")) + 
+  scale_shape_manual(values = c(17,19)) +
+  labs(
+    title = "Lung Cancer Stage vs. Smoking Years", 
+    subtitle = "Comparison by Gender",
+    x = "Years of Smoking",
+    y = "Cancer Stage"
+    ) + 
+  theme_minimal() +
+  theme(
+    plot.background = element_rect(fill = "#f7f7f7"),
+    plot.title = element_text(face="bold", size=15),
+    plot.subtitle = element_text(face="italic"),
+    strip.text.x = element_text(size = 15, face="bold"),
+    legend.position = "bottom",
+    legend.title = element_text(size=12),
+    legend.text = element_text(size=10),
+    axis.title=element_text(size=14)
+  )
+```
+
+### 4. Use the ggplot2 package for this graph. (Hint: use scale_fill_viridis_d(option = "plasma" to get the same colors)
+
+```{r}
+filtered_df_air <-  df_air %>% filter(Country %in% c("Brazil", "India", "Russian Federation", "Germany", "Italy", "United States of America"))
+ggplot(filtered_df_air , aes(x = PM2.5_AQI_Value, fill=Country)) + 
+  facet_wrap(~Country, scales = "free_y") + 
+  geom_histogram(bins=50, color="black") + 
+  scale_fill_viridis_d(option = "plasma") +
+  labs(
+    title = "PM2.5 AQI Distribution Across Countries", 
+    subtitle = "Comparison of Air Pollution Levels",
+    x = "PM2.5 AQI Value",
+    y = "Frequency"
+    ) +
+  theme_minimal() +
+  theme(
+    plot.background = element_rect(fill = "#f7f7f7"),
+    plot.title = element_text(face="bold", size=15),
+    plot.subtitle = element_text(face="italic"),
+    strip.text.x = element_text(face="bold"),
+    legend.position = "bottom",
+    legend.title = element_text(size=12),
+    legend.text = element_text(size=10),
+    axis.title=element_text(size=15)
+  )
+```
