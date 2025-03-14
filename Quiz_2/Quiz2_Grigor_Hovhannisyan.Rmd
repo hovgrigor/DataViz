@@ -1,0 +1,87 @@
+---
+title: "Quiz_2_Grigor_Hovhannisyan"
+output: pdf_document
+date: "2025-02-19"
+---
+
+# Group 2
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+
+#Could be done inside a for loop but since its only 5 circles its okayish.
+center = c(0,0)
+diameter = 1
+num_points = 100
+r = diameter / 2
+
+tt1 <- seq(0,2*pi,length.out = num_points)
+xx1 <- center[1] + r * cos(tt)
+yy1 <- center[2] + r * sin(tt)
+
+center = c(0,0)
+diameter = 2
+num_points = 100
+r = diameter / 2
+
+tt2 <- seq(0,2*pi,length.out = num_points)
+xx2 <- center[1] + r * cos(tt)
+yy2 <- center[2] + r * sin(tt)
+
+center = c(0,0)
+diameter = 3
+num_points = 100
+r = diameter / 2
+
+tt3 <- seq(0,2*pi,length.out = num_points)
+xx3 <- center[1] + r * cos(tt)
+yy3 <- center[2] + r * sin(tt)
+
+center = c(0,0)
+diameter = 4
+num_points = 100
+r = diameter / 2
+
+tt4 <- seq(0,2*pi,length.out = num_points)
+xx4 <- center[1] + r * cos(tt)
+yy4 <- center[2] + r * sin(tt)
+
+center = c(0,0)
+diameter = 5
+num_points = 100
+r = diameter / 2
+
+tt5 <- seq(0,2*pi,length.out = num_points)
+xx5 <- center[1] + r * cos(tt)
+yy5 <- center[2] + r * sin(tt)
+
+
+
+
+
+df = data.frame(x1 = xx1, y1 = yy1, x2 = xx2, y2 = yy2, x3 = xx3, y3 = yy3, x4 = xx4, y4 = yy4, x5 = xx5, y5 = yy5)
+
+```
+
+```{r}
+ggplot(df) + geom_path(aes(x1,y1)) + geom_path(aes(x2,y2)) + geom_path(aes(x3,y3)) + geom_path(aes(x4,y4)) + geom_path(aes(x5,y5))   
+```
+Cords are not fixed which is why i could not filter the noise to be only on the cirlce.
+```{r}
+df = data.frame(x = 0, y = 0)
+set.seed(1)
+x_rand = rnorm(30, 0, 0.001)
+y_rand = rnorm(30, 0, 0.001)
+df2 = data.frame(x = x_rand, y = y_rand)
+df2 = df2 %>% filter(x>-0.001,  x<0.001,  y > -0.001,  y<0.001,)
+ggplot(df, aes(x,y)) + 
+geom_point(size=80, color="blue") + 
+geom_point(size=60, color="yellow") + 
+geom_point(size=40, color="red") + 
+geom_point(size=20, color="purple") + 
+geom_point(size=10, color="yellow") +
+geom_point(data=df2, aes(x,y), color="white", size=1)
+
+```
