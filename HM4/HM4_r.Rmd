@@ -1,0 +1,45 @@
+---
+title: "HM4_r"
+output: pdf_document
+date: "2025-03-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Homework N4
+
+## Part 5: Overall performance
+
+### Define unique color for each team per season. For each season create horizontal bar plot using total number of points. Highlighting the winner with the unique color that you assigned to it. Save all graphs in pdf. 
+```{r cars}
+library(ggplot2)
+
+df <- read.csv(".\\bundesliga2.csv")
+head(df)
+```
+
+```{r}
+library(Polychrome)
+colors = createPalette(length(unique(df$TEAM)),  c("#ff0000", "#00ff00", "#0000ff"))
+top_team_color <- "#000000"
+names(colors) <- unique(df$TEAM)
+df$COLOR <- colors[df$TEAM]
+seasons <- unique(df$SEASON)
+pdf("points_per_season.pdf", width = 8, height = 6)
+for (season in seasons) {
+  df_season <- df[df$SEASON == season, ]
+  top_team <- df_season$TEAM[which.max(df_season$POINTS)]
+  df_season$COLOR[df_season$TEAM == top_team] <- top_team_color
+  season_colors <- setNames(df_season$COLOR, df_season$TEAM)
+  p <- ggplot(df_season, aes(x = POINTS, y = TEAM, fill = TEAM)) + 
+    geom_bar(stat = 'identity') +
+    scale_fill_manual(values = season_colors) +
+    theme_minimal() +
+    labs(title = paste("Season:", season), subtitle='Top team is highlighted in  Black')
+  print(p)
+}
+dev.off()
+print("Done!")
+```
